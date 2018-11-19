@@ -2,19 +2,17 @@ import argparse
 import tarfile
 import tempfile
 import sys
+import shutil
 
 from os import path, listdir, makedirs, unlink
 from os.path import join
 
 import logging
-from shutil import copy
 
 sys.path.insert(0, '../')
 from processor import reports
 
 logger = logging.getLogger(__name__)
-temp_dir = None
-
 
 def create_batch_dir(working_directory, reports_handler):
     batch_dir_name = str(reports_handler.processable_reports[0].observations[0].day_timestamp)
@@ -23,7 +21,7 @@ def create_batch_dir(working_directory, reports_handler):
     for report in reports_handler.processable_reports:
         src = report.file_path
         dst = batch_dir_path
-        copy(src, dst)
+        shutil.copy(src, dst)
 
 
 def reshape_results(working_directory):
@@ -48,7 +46,9 @@ def parse_args(raw_args=None):
                                                  'exploratory analysis.')
     parser.add_argument('--source_directory',
                         help='The path to the directory where the reports are.')
-    parser.add_argument('--output', '-o', action='store', default='batch-test-report.tar.gz', type=str,
+    parser.add_argument('--output_directory', type=str,
+                        help='The name of the output directory.')
+    parser.add_argument('--output_filename', '-o', action='store', default='batch-test-report.tar.gz', type=str,
                         help='The name of the output file. By default "batch-test-report.tar.gz".')
     args = parser.parse_args(raw_args)
     return args
@@ -56,16 +56,26 @@ def parse_args(raw_args=None):
 if __name__ == "__main__":
     args = parse_args()
     logger.debug(args)
-    # abs_file_path = path.abspath(args.file_path)
-    # abs_output_path = path.abspath(args.output)
-    abs_source_path = path.abspath(args.source_directory)
-    abs_output_path = path.abspath(args.output)
-    reshape_results(abs_source_path)
-    logger.info("Creating output TAR.")
-    tar = tarfile.open(abs_output_path, mode='w:gz')
-    tar.add(abs_source_path, arcname='')
+    abs_source_dir = path.abspath(args.source_directory)
+    abs_output_dir = path.abspath(args.output_directory)
+    output_filename = args.output_filename
+
+    temp_dir = tempfile.mkdtemp()
+    logger.info("Copying tix logs to temp dir: {}".format(temp_dir))
+    source_files = listdir(abs_source_dir)
+    for file in source_files:
+        file_full_path = join(abs_source_dir, file)
+        shutil.copy(file_full_path, temp_dir)
+
+    logger.info("Generating batches")
+    reshape_results(temp_dir)
+
+    abs_output_file = join(abs_output_dir, output_filename)
+    logger.info("Creating output TAR {}.".format(abs_output_file))
+    tar = tarfile.open(abs_output_file, mode='w:gz')
+    tar.add(temp_dir, arcname='')
     tar.close()
     logger.info("Output TAR successfully created.")
-    if temp_dir is not None:
-        temp_dir.cleanup()
-        logger.info("Temporary directory destroyed.")
+
+    logger.info("Deleting temp dir {}".format(temp_dir))
+    shutil.rmtree(temp_dir)
