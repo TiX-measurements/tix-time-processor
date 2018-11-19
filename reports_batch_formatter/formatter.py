@@ -3,6 +3,7 @@ import tarfile
 import tempfile
 import sys
 import shutil
+import os
 
 from os import path, listdir, makedirs, unlink
 from os.path import join
@@ -37,6 +38,10 @@ def reshape_results(working_directory):
         create_batch_dir(working_directory, reports_handler)
         for report in reports_handler.processable_reports:
             unlink(report.file_path)
+
+    os.rmdir(reports_handler.failed_results_dir_path)
+
+
 
 def parse_args(raw_args=None):
     parser = argparse.ArgumentParser(description='Script to shape the report files from the tix-time-condenser into '
