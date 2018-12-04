@@ -105,6 +105,22 @@ There are other configuration variables available for the Docker Container besid
 
 # Tests analysis
 This module also contains a Jupyter Notebook for analyzing calibration tests results. This module can be used after running the calibration test described in the [tix-time-system-test](https://github.com/eduardoneira/tix-time-system-test) module, in order to analyze the results of those tests.
+
+These instructions were tested on Ubuntu 16.04 (64 bits).
+
+## Requirements
+Check that you have python3 along with pip3 and virtualenv:
+
+```sh
+python3 --version
+pip3 --version
+virtualenv --version
+```
+If these packages are not installed, install them running the following:
+sudo apt update
+sudo apt install python3-dev python3-pip
+sudo pip3 install -U virtualenv  # system-wide install
+
 ## Setup
 From the `tix-time-processor` directory, execute:
 ```sh
