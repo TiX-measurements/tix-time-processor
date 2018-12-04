@@ -70,7 +70,9 @@ if __name__ == "__main__":
     source_files = listdir(abs_source_dir)
     for file in source_files:
         file_full_path = join(abs_source_dir, file)
-        shutil.copy(file_full_path, temp_dir)
+        # Skip empty log files
+        if (os.stat(file_full_path).st_size > 0):
+            shutil.copy(file_full_path, temp_dir)
 
     logger.info("Generating batches")
     reshape_results(temp_dir)
