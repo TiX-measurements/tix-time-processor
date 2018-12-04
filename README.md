@@ -160,7 +160,7 @@ python formatter.py \
 ```
 This will generate a file called ```batch-test-report.tar.gz``` in the ```output_directory```.  Extract the tar in a directory of its own (we will need to reference that directory later).
 ```sh
-cs <output_directory>
+cd <output_directory>
 mkdir batch-test-report
 tar -xzf batch-test-report.tar.gz -C batch-test-report/
 ```
