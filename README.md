@@ -117,9 +117,11 @@ pip3 --version
 virtualenv --version
 ```
 If these packages are not installed, install them running the following:
+```sh
 sudo apt update
 sudo apt install python3-dev python3-pip
 sudo pip3 install -U virtualenv  # system-wide install
+```
 
 ## Setup
 From the `tix-time-processor` directory, execute:
